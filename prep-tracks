@@ -5,15 +5,20 @@ rm -f prep-tracks.log
 rm -f import-tracks
 date > prep-tracks.log
 echo "Starting prep-tracks" >> prep-tracks.log
-sort tracks.txt | uniq | awk -F " - " '{print $1"|"$2}' >> import-tracks
-echo "converted tracks.txt to import-tracks" >> prep-tracks.log
-echo " "
-echo "Directory Listing" >> prep-tracks.log
-ls -ltr >> prep-tracks.log
-echo "inserting tracks to musicdb" >> prep-tracks.log
-sqlite3 /home/bobossler/mpv-capture/musicdb < import-tracks.sql
-echo "removing tracks.txt" >> prep-tracks.log
-cat tracks.txt >> tracks.bak
-rm tracks.txt
+if [ -f tracks.txt ]; then
+    sort tracks.txt | uniq | awk -F " - " '{print $1"|"$2}' >> import-tracks
+    echo "converted tracks.txt to import-tracks" >> prep-tracks.log
+    echo " "
+    echo "Directory Listing" >> prep-tracks.log
+    ls -ltr >> prep-tracks.log
+    echo "inserting tracks to musicdb" >> prep-tracks.log
+    sqlite3 /home/bobossler/mpv-capture/musicdb < import-tracks.sql
+    echo "removing tracks.txt" >> prep-tracks.log
+    cat tracks.txt >> tracks.bak
+else
+    echo "No tracks.txt found" >> prep-tracks.log
+fi
+
+rm -f tracks.txt
 ls -ltr >> prep-tracks.log
 cd /home/bobossler/ &> /dev/null
